@@ -3,37 +3,71 @@ import { LOBBY_SIZE } from './constants';
 import { initializePlayer, Player } from './player';
 import { broadcastMsg } from '.';
 
-const gameState = {
-  players: {} as Record<string, Player>
+type Lobby = {
+  id: string,
+  gameState: GameState,
 }
 
-export const getGameState = () => {
-  return gameState
+type GameState = {
+  players: Record<string, Player>
+}
+
+export const lobbies: Record<string, Lobby> = {
+}
+
+const createLobby = (): Lobby => {
+  const id = _.uniqueId('lobby_');
+  const lobby: Lobby = {
+    id,
+    gameState: {
+      players: {},
+    }
+  };
+  lobbies[id] = lobby;
+  return lobby;
+};
+
+export const getLobby = (clientId: string): Lobby | undefined => {
+  return Object.values(lobbies).find((lobby) => clientId in lobby.gameState.players);
 }
 
 export const addToLobby = (clientId: string) => {
-  if (Object.keys(gameState.players).length >= LOBBY_SIZE) {
-    console.log('LOBBY FULL, REJECTING');
-    return;
+  // Find a lobby with room for the player
+  let lobby = Object.values(lobbies).find((lobby) => Object.keys(lobby.gameState.players).length < LOBBY_SIZE);
+  if (!lobby) { // if one doesn't exist, create a new lobby
+    lobby = createLobby();
   }
 
-  gameState.players[clientId] = initializePlayer();
+  lobby.gameState.players[clientId] = initializePlayer();
 
   console.log('PLAYER JOINED', clientId)
-  console.log('NUM PLAYERS', Object.keys(gameState.players).length);
+  console.log('NUM PLAYERS', Object.keys(lobby.gameState.players).length);
 }
 
 export const removeFromLobby = (clientId: string) => {
-  delete gameState.players[clientId];
+  const lobby = getLobby(clientId);
+  if (!lobby) return;
+
+  delete lobby.gameState.players[clientId];
+
+  if (Object.keys(lobby.gameState.players).length === 0) {
+    delete lobbies[lobby.id];
+    console.log(`LOBBY ${lobby.id} DELETED`);
+  }
 }
 
 export const updatePlayerState = (clientId: string, newPlayerState: { x: number, z: number, angle: number }) => {
-  const prevState = gameState.players[clientId];
+  const lobby = getLobby(clientId);
+  if (!lobby) {
+    return;
+  }
+
+  const prevState = lobby.gameState.players[clientId];
   if (!prevState) {
     return;
   }
 
-  gameState.players[clientId] = {
+  lobby.gameState.players[clientId] = {
     ...prevState,
     ...newPlayerState,
   }
@@ -70,31 +104,34 @@ const isPlayerInCone = (shooter: Player, target: Player): { hit: boolean, distan
 };
 
 export const fire = (clientId) => {
-  const player = gameState.players[clientId];
+  const lobby = getLobby(clientId);
+  if (!lobby) return;
+
+  const player = lobby.gameState.players[clientId];
   if (!player || !player?.ammo) {
     return;
   }
 
-  Object.entries(gameState.players).forEach(([playerId, otherPlayer]) => {
+  Object.entries(lobby.gameState.players).forEach(([playerId, otherPlayer]) => {
     if (playerId === clientId) return;
     const { hit, distance } = isPlayerInCone(player, otherPlayer);
     if (hit) {
       const maxDamage = 80;
       const minDamage = 10;
       const damage = maxDamage - ((maxDamage - minDamage) * (distance / CONE_RANGE));
-      gameState.players[playerId].health -= Math.max(minDamage, damage);
+      lobby.gameState.players[playerId].health -= Math.max(minDamage, damage);
     }
   })
 
-  gameState.players[clientId].ammo -= 1;
+  lobby.gameState.players[clientId].ammo -= 1;
 
   setTimeout(() => {
-    if (gameState.players[clientId]){
-      gameState.players[clientId].ammo += 1;
+    if (lobby.gameState.players[clientId]){
+      lobby.gameState.players[clientId].ammo += 1;
     }
   }, 3000) // 3s reload
 
-  broadcastMsg({
+  broadcastMsg(lobby.id, {
     type: 'FIRED',
     data: {
       clientId

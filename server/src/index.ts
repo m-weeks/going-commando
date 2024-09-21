@@ -2,8 +2,7 @@ import express from 'express';
 import _ from 'lodash';
 import { createServer } from 'http';
 import { WebSocketServer, WebSocket } from 'ws';
-import { addToLobby, fire, removeFromLobby, updatePlayerState } from './lobby';
-import { getGameState } from './lobby';
+import { addToLobby, fire, getLobby, lobbies, removeFromLobby, updatePlayerState } from './lobby';
 
 const app = express();
 const server = createServer(app);
@@ -41,22 +40,27 @@ wss.on('connection', (ws) => {
   });
 });
 
-export const broadcastMsg = (data = {}, excludedClients: string[] = []) => {
+export const broadcastMsg = (lobbyId: string, data = {}, excludedClients: string[] = []) => {
   _.forEach(clients, (ws, clientId) => {
     if (excludedClients.includes(clientId)) {
       return;
     }
+    const lobby = getLobby(clientId);
+    if (!lobby || lobby.id !== lobbyId) return;
+
     ws.send(JSON.stringify({
       ...data,
       clientId,
-    }))
+    }));
   });
 }
 
 export const updateClients = () => {
-  broadcastMsg({
-    type: 'SYNC',
-    data: getGameState(),
+  _.forEach(lobbies, (lobby) => {
+    broadcastMsg(lobby.id, {
+      type: 'SYNC',
+      data: lobby.gameState,
+    }, []);
   });
 };
 

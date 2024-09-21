@@ -1,1 +1,1 @@
-export const LOBBY_SIZE = 10;
+export const LOBBY_SIZE = 2;
