@@ -2,7 +2,7 @@ import express from 'express';
 import _ from 'lodash';
 import { createServer } from 'http';
 import { WebSocketServer, WebSocket } from 'ws';
-import { addToLobby, removeFromLobby, updatePlayerState } from './lobby';
+import { addToLobby, fire, removeFromLobby, updatePlayerState } from './lobby';
 import { getGameState } from './lobby';
 
 const app = express();
@@ -26,18 +26,26 @@ wss.on('connection', (ws) => {
         const newPlayerData = _.pick(msg.data, ['x', 'z', 'angle']);
         updatePlayerState(clientId, newPlayerData);
         break;
+      case 'FIRE':
+        fire(clientId);
+        break;
     }
   });
 
-  ws.on('close', () => {
-    console.log('CLOSED');
+  ws.on('close', (code, reason) => {
+    console.log('CLOSED', clientId);
+    console.log('Close Code: ', code);
+    console.log('Close Reason: ', reason.toString());
     delete clients[clientId];
     removeFromLobby(clientId);
   });
 });
 
-const broadcastMsg = (data = {}) => {
+export const broadcastMsg = (data = {}, excludedClients: string[] = []) => {
   _.forEach(clients, (ws, clientId) => {
+    if (excludedClients.includes(clientId)) {
+      return;
+    }
     ws.send(JSON.stringify({
       ...data,
       clientId,

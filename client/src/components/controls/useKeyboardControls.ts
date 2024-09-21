@@ -32,6 +32,9 @@ export const useKeyboardControls = () : MovementData => {
       case 'KeyE':
         movementDataRef.current.x = 1;
         break;
+      case 'Space':
+        
+        break;
       default:
         break;
     }

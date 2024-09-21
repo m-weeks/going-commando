@@ -11,9 +11,9 @@ function App() {
     <div style={{ position: 'relative' }}>
       <ServerConnection>
           {
-            (({ gameState, localState, updatePlayer }) => (
+            (({ gameState, localState, updatePlayer, sendMessage }) => (
               <>
-                <Controls>
+                <Controls sendMessage={sendMessage} clientId={localState.clientId}>
                   {({ movementData }) => (
                     <Canvas style={{ width: '100vw', height: '100vh' }} shadows>
                       <CameraControls localState={localState} updatePlayer={updatePlayer} movementData={movementData} />
@@ -27,6 +27,7 @@ function App() {
                                 key={playerId}
                                 player={localState.player}
                                 currentPlayer
+                                clientId={playerId}
                               />
                             );
                           }
@@ -34,6 +35,7 @@ function App() {
                             <Avatar
                               key={playerId}
                               player={player}
+                              clientId={playerId}
                             />
                           );
                         })

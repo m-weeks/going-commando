@@ -1,6 +1,7 @@
 import _ from 'lodash';
 import { LOBBY_SIZE } from './constants';
 import { initializePlayer } from './player';
+import { broadcastMsg } from '.';
 
 const gameState = {
   players: {},
@@ -38,3 +39,25 @@ export const updatePlayerState = (clientId: string, newPlayerState: { x: number,
     id: clientId, // ensure clientId is not overwritten
   }
 };
+
+export const fire = (clientId) => {
+  const player = gameState.players[clientId];
+  if (!player || !player?.ammo) {
+    return;
+  }
+
+  player.ammo -= 1;
+
+  setTimeout(() => {
+    if (gameState.players[clientId]){
+      gameState.players[clientId].ammo += 1;
+    }
+  }, 3000) // 3s reload
+
+  broadcastMsg({
+    type: 'FIRED',
+    data: {
+      clientId
+    }
+  });
+}

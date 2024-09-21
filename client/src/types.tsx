@@ -2,6 +2,13 @@ export type Player = {
   x: number,
   z: number,
   angle: number,
+  ammo: 1,
+}
+
+export type Projectile = {
+  originX: number,
+  originZ: number,
+  angle: number,
 }
 
 export type GameState = {

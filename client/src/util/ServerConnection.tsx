@@ -17,6 +17,8 @@ export default ({ children }: { children: (gameData: GameData) => void }) => {
   const localStateRef = useRef(localState)
   localStateRef.current = localState
 
+  const [disconnected, setDisconnected] = useState(false);
+
   useEffect(() => {
     const socket = new WebSocket(import.meta.env.VITE_WEBSOCKET_SERVER);
     socketRef.current = socket;
@@ -57,10 +59,13 @@ export default ({ children }: { children: (gameData: GameData) => void }) => {
 
           return result;
         })
+      } else if (msg.type === 'FIRED') {
+        window.dispatchEvent(new CustomEvent('fire', { detail: { clientId: msg.data.clientId } }));
       }
     }
   
     socket.onclose = (e) => {
+      setDisconnected(true);
       console.log('Connection closed');
     }
   
@@ -107,6 +112,10 @@ export default ({ children }: { children: (gameData: GameData) => void }) => {
 
   if (!localState.loaded || !localState.player || !localState.clientId) {
     return null;
+  }
+
+  if (disconnected) {
+    return <div>Disconnected</div>
   }
 
   return (

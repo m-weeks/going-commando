@@ -1,7 +1,8 @@
 import { Joystick, JoystickShape } from 'react-joystick-component';
 import { useKeyboardControls } from './useKeyboardControls';
-import { ReactNode, useRef } from 'react';
+import { ReactNode, useRef, useState } from 'react';
 import { IJoystickUpdateEvent } from 'react-joystick-component/build/lib/Joystick';
+import { GameData } from '../../types';
 
 export type MovementData = {
   x: number;
@@ -12,7 +13,7 @@ export type MovementData = {
   rotationSpeed: number;
 };
 
-const Controls = ({ children }: { children: ({ movementData } : { movementData: MovementData}) => ReactNode }) => {
+const Controls = ({ clientId, children, sendMessage }: { clientId: string, children: ({ movementData } : { movementData: MovementData}) => ReactNode } & Pick<GameData, 'sendMessage'>) => {
   // Mostly just exists for debugging purposes
   const keyboardMovementData = useKeyboardControls();
 
@@ -75,6 +76,18 @@ const Controls = ({ children }: { children: ({ movementData } : { movementData: 
     };
   }
 
+  const [clicked, setClicked] = useState(false)
+
+  const handleFire = () => {
+    setClicked(true);
+    // window.dispatchEvent(new CustomEvent('fire', { detail: { clientId } }));
+    sendMessage('FIRE', {})
+  }
+
+  const handleStopFire = () => {
+    setClicked(false);
+  }
+
   return (
     <>
       {
@@ -90,9 +103,12 @@ const Controls = ({ children }: { children: ({ movementData } : { movementData: 
         })
       }
 
-      <div style={{ position: 'fixed', zIndex: '1', bottom: '20vh', right: '15vw', opacity: 0.5 }}>
+      <div style={{ position: 'fixed', zIndex: '1', bottom: '20vh', right: '10vw', opacity: 0.5 }}>
+        <button className={`fireButton ${clicked ? 'clicked' : ''}`} onPointerDown={handleFire} onPointerUp={handleStopFire}>
+          FIRE!
+        </button>
         <Joystick
-          size={100}
+          size={150}
           baseColor="rgba(0,0,0,0.5)"
           stickColor="rgba(255,255,255,0.8)"
           move={handleRotate}
@@ -103,9 +119,9 @@ const Controls = ({ children }: { children: ({ movementData } : { movementData: 
           stickShape={JoystickShape.Square}
         />
       </div>
-      <div style={{ position: 'fixed', zIndex: '1', bottom: '20vh', left: '15vw', opacity: 0.5 }}>
+      <div style={{ position: 'fixed', zIndex: '1', bottom: '20vh', left: '10vw', opacity: 0.5 }}>
         <Joystick
-          size={100}
+          size={150}
           baseColor="rgba(0,0,0,0.5)"
           stickColor="rgba(255,255,255,0.8)"
           move={handleMove}

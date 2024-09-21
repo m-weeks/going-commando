@@ -2,6 +2,7 @@ export type Player = {
   x: number,
   z: number,
   angle: number,
+  ammo: number,
 }
 
 const map = [
@@ -42,5 +43,6 @@ export const initializePlayer = (): Player => {
     x: x,
     z: z,
     angle: Math.PI,
+    ammo: 1,
   };
 }

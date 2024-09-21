@@ -11,7 +11,7 @@ function TexturedWall({ textureImage, position, args, repeatX, repeatY }) {
   }
 
   return (
-    <mesh position={position}>
+    <mesh position={position} receiveShadow>
       <boxGeometry args={args} />
       <meshStandardMaterial map={texture} />
     </mesh>

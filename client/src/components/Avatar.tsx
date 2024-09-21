@@ -1,12 +1,10 @@
 import { useFrame } from '@react-three/fiber';
 import { Object3D } from 'three';
 import { Player } from '../types';
-import { useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
+import FiringCone from './FiringCone';
 
-const Avatar = ({ player, currentPlayer = false }: { player: Player, currentPlayer?: boolean }) => {
-  // const texture = useLoader(TextureLoader, avatar);
-  // const material = new SpriteMaterial({ map: texture })
-
+const Avatar = ({ player, currentPlayer = false, clientId }: { player: Player, currentPlayer?: boolean, clientId: string }) => {
   const targetRef = useRef(new Object3D());
 
   useFrame(() => {
@@ -34,12 +32,12 @@ const Avatar = ({ player, currentPlayer = false }: { player: Player, currentPlay
       </sprite> */}
       <mesh position={[
           player.x,
-          0 - (0.5 / 2),
+          0,
           player.z
         ]}
         rotation={[0, player.angle, 0]}
       >
-        <boxGeometry args={[0.5, 0.5, 0.5]} />
+        <boxGeometry args={[0.5, 1, 0.5]} />
         <meshStandardMaterial color={"green"} />
       </mesh>
       {
@@ -62,6 +60,8 @@ const Avatar = ({ player, currentPlayer = false }: { player: Player, currentPlay
 
       {/* Invisible object that the spotlight is targeting */}
       <primitive object={targetRef.current} />
+
+      <FiringCone player={player} clientId={clientId} />
     </>
   );
 };
