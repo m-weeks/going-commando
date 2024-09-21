@@ -65,7 +65,7 @@ export const removeFromLobby = (clientId: string) => {
   if (Object.keys(lobby.gameState.players).length === 0) {
     delete lobbies[lobby.id];
     console.log(`LOBBY ${lobby.id} DELETED`);
-  } else if (Object.keys(lobby.gameState.players).length === 1) { // award victory to remaining player
+  } else if (Object.keys(lobby.gameState.players).length === 1 && !lobby.gameState.winner) { // award victory to remaining player
     lobby.gameState.winner = Object.keys(lobby.gameState.players)[0];
   }
 }
@@ -195,6 +195,7 @@ export const rematch = (clientId) => {
   }
 
   if (lobby.gameState.winner === clientId) {
+    console.log('WINNER', clientId);
     playerData.score = (player.score ?? 0) + 1;
   }
 
