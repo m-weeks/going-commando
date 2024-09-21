@@ -12,6 +12,7 @@ type GameState = {
   players: Record<string, Player>,
   started: boolean,
   winner?: string,
+  reloadTimer: number | null
 }
 
 export const lobbies: Record<string, Lobby> = {
@@ -25,6 +26,7 @@ const createLobby = (): Lobby => {
       players: {},
       started: false,
       winner: undefined,
+      reloadTimer: null,
     }
   };
   lobbies[id] = lobby;
@@ -135,11 +137,30 @@ export const fire = (clientId) => {
 
   lobby.gameState.players[clientId].ammo -= 1;
 
-  setTimeout(() => {
-    if (lobby.gameState.players[clientId]){
-      lobby.gameState.players[clientId].ammo += 1;
-    }
-  }, 3000) // 3s reload
+  const playersWithAmmo = Object.values(lobby.gameState.players).filter((player) => player.ammo > 0);
+
+  if (playersWithAmmo.length === 0) {
+    lobby.gameState.reloadTimer = 3;
+  }
+  
+  if (!lobby.gameState.reloadTimer) {
+    lobby.gameState.reloadTimer = 10;
+
+    const timerInterval = setInterval(() => {
+      if (lobby.gameState.reloadTimer != undefined) {
+        lobby.gameState.reloadTimer -= 1;
+      }
+
+      if ((lobby.gameState.reloadTimer ?? 0) <= 0 || !playersWithAmmo.length) {
+        clearInterval(timerInterval);
+        lobby.gameState.reloadTimer = null;
+        _.forEach(lobby.gameState.players, (_, playerId) => {
+          lobby.gameState.players[playerId].ammo = 1;
+        })
+      }
+    }, 1000);
+  }
+
 
   broadcastMsg(lobby.id, {
     type: 'FIRED',

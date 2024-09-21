@@ -16,6 +16,7 @@ export type GameState = {
   players: Record<string, Player>,
   started: boolean,
   winner?: string
+  reloadTimer: number | null
 }
 
 export type LocalState = {

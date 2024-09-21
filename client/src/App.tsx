@@ -15,7 +15,7 @@ function App() {
             (({ gameState, localState, updatePlayer, sendMessage }) => (
               <>
                 {/* Show hud data from most up-to date player info from server */}
-                <HUD player={localState.player} /> 
+                <HUD player={localState.player} gameState={gameState} /> 
                 <Controls sendMessage={sendMessage}>
                   {({ movementData }) => (
                     <Canvas style={{ width: '100vw', height: '100vh' }} shadows>
