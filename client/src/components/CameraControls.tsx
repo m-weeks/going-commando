@@ -2,9 +2,9 @@ import _ from 'lodash';
 import { useEffect, useRef } from 'react';
 import { useThree, useFrame } from '@react-three/fiber';
 import { mapData } from './Map';
-import { Vector3 } from 'three'
+import { Euler, Quaternion, Vector3 } from 'three'
 import { GameData } from '../types';
-import { MOVE_SPEED, ROTATION_SPEED } from '../constants'
+import { CAMERA_ANGLE, CAMERA_HEIGHT, CAMERA_OFFSET, MOVE_SPEED, ROTATION_SPEED } from '../constants'
 import { MovementData } from './controls/Controls';
 
 export default function CameraControls({ localState, updatePlayer, movementData }: Pick<GameData, 'localState' | 'updatePlayer'> & { movementData: MovementData}) {
@@ -17,10 +17,11 @@ export default function CameraControls({ localState, updatePlayer, movementData 
   const originalPlayerRef = useRef(player);
 
   useEffect(() => {
-    camera.position.x = originalPlayerRef.current.x;
-    camera.position.z = originalPlayerRef.current.z;
-    camera.position.y = 0.15;
-    camera.rotation.y = originalPlayerRef.current.angle;
+    camera.position.set(
+      originalPlayerRef.current.x - Math.sin(originalPlayerRef.current.angle) * CAMERA_OFFSET,
+      CAMERA_HEIGHT,
+      originalPlayerRef.current.z - Math.cos(originalPlayerRef.current.angle) * CAMERA_OFFSET
+    );
   }, []);
 
   const checkCollision = (newPosition) => {
@@ -54,29 +55,42 @@ export default function CameraControls({ localState, updatePlayer, movementData 
     camera.getWorldDirection(forwardDirection);
     rightDirection.copy(forwardDirection).applyAxisAngle(new Vector3(0, 1, 0), -Math.PI / 2);
   
+    const newPlayerData = {
+      x: player.x,
+      z: player.z,
+      angle: player.angle,
+    };
+
     // Calculate new positions
-    const newPositionX = camera.position.x + forwardDirection.x * y * speedPerFrame + rightDirection.x * x * speedPerFrame;
-    const newPositionZ = camera.position.z + forwardDirection.z * y * speedPerFrame + rightDirection.z * x * speedPerFrame;
+    const newPositionX = newPlayerData.x + forwardDirection.x * y * speedPerFrame + rightDirection.x * x * speedPerFrame;
+    const newPositionZ = newPlayerData.z + forwardDirection.z * y * speedPerFrame + rightDirection.z * x * speedPerFrame;
   
-    if (!checkCollision({ x: newPositionX, z: camera.position.z })) {
-      camera.position.x = newPositionX;
+    if (!checkCollision({ x: newPositionX, z: newPlayerData.z })) {
+      newPlayerData.x = newPositionX;
     }
-    if (!checkCollision({ x: camera.position.x, z: newPositionZ })) {
-      camera.position.z = newPositionZ;
+    if (!checkCollision({ x: newPlayerData.x, z: newPositionZ })) {
+      newPlayerData.z = newPositionZ;
     }
   
     if (rotateLeft) {
-      camera.rotation.y += rotationPerFrame;
+      newPlayerData.angle += rotationPerFrame;
     }
     if (rotateRight) {
-      camera.rotation.y -= rotationPerFrame;
+      newPlayerData.angle -= rotationPerFrame;
     }
+
+    camera.position.x = newPlayerData.x + Math.sin(newPlayerData.angle) * CAMERA_OFFSET;
+    camera.position.z = newPlayerData.z + Math.cos(newPlayerData.angle) * CAMERA_OFFSET;
+
+    const yAxisRotation = new Quaternion().setFromAxisAngle(new Vector3(0, 1, 0), newPlayerData.angle);
+    const xAxisRotation = new Quaternion().setFromEuler(new Euler(CAMERA_ANGLE, 0, 0));
+    camera.setRotationFromQuaternion(yAxisRotation.multiply(xAxisRotation))
 
     // Update local state copy to have new position. This will get synced with the server at a regular interval
     updatePlayer({
-      x: camera.position.x,
-      z: camera.position.z,
-      angle: camera.rotation.y % (Math.PI * 2),
+      x: newPlayerData.x,
+      z: newPlayerData.z,
+      angle: newPlayerData.angle % (Math.PI * 2),
     });
   });
 

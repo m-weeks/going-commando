@@ -1,24 +1,68 @@
-import { useLoader } from '@react-three/fiber';
-import { TextureLoader, SpriteMaterial, Sprite } from 'three';
-import avatar from './assets/avatar.png';
+import { useFrame } from '@react-three/fiber';
+import { Object3D } from 'three';
 import { Player } from '../types';
+import { useRef } from 'react';
 
-const Avatar = ({ player }: { player: Player }) => {
-  const texture = useLoader(TextureLoader, avatar);
-  const material = new SpriteMaterial({ map: texture })
+const Avatar = ({ player, currentPlayer = false }: { player: Player, currentPlayer?: boolean }) => {
+  // const texture = useLoader(TextureLoader, avatar);
+  // const material = new SpriteMaterial({ map: texture })
+
+  const targetRef = useRef(new Object3D());
+
+  useFrame(() => {
+    if (targetRef.current) {
+      targetRef.current.position.set(
+        player.x,
+        0.75,
+        player.z,
+      );
+    }
+  });
 
   return (
-    <sprite
-      material={material}
-      position={[
-        player.x,
-        0 - (0.1 / 2),
-        player.z
-      ]}
-      scale={[0.75, 0.9, 0.75]}
-    >
-      <primitive object={new Sprite(material)} />
-    </sprite>
+    <>
+      {/* <sprite
+        material={material}
+        position={[
+          player.x,
+          0 - (0.1 / 2),
+          player.z
+        ]}
+        scale={[0.75, 0.9, 0.75]}
+      >
+        <primitive object={new Sprite(material)} />
+      </sprite> */}
+      <mesh position={[
+          player.x,
+          0 - (0.5 / 2),
+          player.z
+        ]}
+        rotation={[0, player.angle, 0]}
+      >
+        <boxGeometry args={[0.5, 0.5, 0.5]} />
+        <meshStandardMaterial color={"green"} />
+      </mesh>
+      {
+        currentPlayer && (
+          <spotLight
+            position={[
+              player.x + Math.sin(player.angle) * 3,
+              0.75,
+              player.z + Math.cos(player.angle) * 3
+            ]}
+            target={targetRef.current}
+            angle={Math.PI / 6}
+            intensity={2}
+            distance={7}
+            decay={0.1}
+            castShadow
+          />
+        )
+      }
+
+      {/* Invisible object that the spotlight is targeting */}
+      <primitive object={targetRef.current} />
+    </>
   );
 };
 

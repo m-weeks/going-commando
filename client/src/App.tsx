@@ -15,14 +15,20 @@ function App() {
               <>
                 <Controls>
                   {({ movementData }) => (
-                    <Canvas style={{ width: '100vw', height: '100vh' }}>
+                    <Canvas style={{ width: '100vw', height: '100vh' }} shadows>
                       <CameraControls localState={localState} updatePlayer={updatePlayer} movementData={movementData} />
-                      <ambientLight intensity={2} />
+                      {/* <ambientLight intensity={2} /> */}
                       <Map />
                       {
                         _.map(gameState.players, (player, playerId) => {
                           if (playerId === localState.clientId) {
-                            return null;
+                            return (
+                              <Avatar
+                                key={playerId}
+                                player={localState.player}
+                                currentPlayer
+                              />
+                            );
                           }
                           return (
                             <Avatar

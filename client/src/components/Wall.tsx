@@ -38,7 +38,7 @@ export default function Wall({
   } 
 
   return (
-    <mesh position={position}>
+    <mesh position={position} receiveShadow>
       <boxGeometry args={args} />
       <meshStandardMaterial color={color ?? "grey" } />
     </mesh>
