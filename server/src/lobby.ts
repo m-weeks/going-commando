@@ -2,6 +2,7 @@ import _ from 'lodash';
 import { LOBBY_SIZE } from './constants';
 import { initializePlayer, Player } from './player';
 import { broadcastMsg, singleMsg } from '.';
+import { getMap } from './map';
 
 type Lobby = {
   id: string,
@@ -13,6 +14,7 @@ type GameState = {
   started: boolean,
   winner: string | null,
   reloadTimer: number | null
+  map: number[][],
 }
 
 export const lobbies: Record<string, Lobby> = {
@@ -27,6 +29,7 @@ const createLobby = (): Lobby => {
       started: false,
       winner: null,
       reloadTimer: null,
+      map: getMap(),
     }
   };
   lobbies[id] = lobby;
@@ -37,14 +40,17 @@ export const getLobby = (clientId: string): Lobby | undefined => {
   return Object.values(lobbies).find((lobby) => clientId in lobby.gameState.players);
 }
 
-export const addToLobby = (clientId: string, player?: Player) => {
+export const addToLobby = (clientId: string, player?: Partial<Player>) => {
   // Find a lobby with room for the player
   let lobby = Object.values(lobbies).find((lobby) => Object.keys(lobby.gameState.players).length < LOBBY_SIZE && !lobby.gameState.started);
   if (!lobby) { // if one doesn't exist, create a new lobby
     lobby = createLobby();
   }
 
-  lobby.gameState.players[clientId] = player ?? initializePlayer();
+  lobby.gameState.players[clientId] = {
+    ...player,
+    ...initializePlayer(lobby.gameState.map)
+  };
 
   if (Object.values(lobby.gameState.players).length >= LOBBY_SIZE) {
     lobby.gameState.started = true;
@@ -190,9 +196,7 @@ export const rematch = (clientId) => {
     return;
   }
 
-  const playerData: Player = {
-    ...initializePlayer(),
-  }
+  const playerData: Partial<Player> = {}
 
   if (lobby.gameState.winner === clientId) {
     console.log('WINNER', clientId);
@@ -200,12 +204,12 @@ export const rematch = (clientId) => {
   }
 
   removeFromLobby(clientId);
-  addToLobby(clientId, playerData);
+  const newLobby = addToLobby(clientId, playerData);
 
   singleMsg(clientId, {
     type: 'RESET_PLAYER',
     data: {
-      player: playerData,
+      player: newLobby.gameState.players[clientId],
     }
   })
 }

@@ -18,6 +18,7 @@ export type GameState = {
   started: boolean,
   winner: string | null
   reloadTimer: number | null
+  map: number[][],
 }
 
 export type LocalState = {

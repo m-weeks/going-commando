@@ -1,7 +1,6 @@
 import _ from 'lodash';
 import { useEffect, useRef } from 'react';
 import { useThree, useFrame } from '@react-three/fiber';
-import { mapData } from './Map';
 import { Euler, Quaternion, Vector3 } from 'three'
 import { GameData } from '../types';
 import { CAMERA_ANGLE, CAMERA_HEIGHT, CAMERA_OFFSET, MOVE_SPEED, ROTATION_SPEED } from '../constants'
@@ -9,6 +8,7 @@ import { MovementData } from './controls/Controls';
 
 export default function CameraControls({ localState, updatePlayer, movementData, gameState }: Pick<GameData, 'localState' | 'updatePlayer' | 'gameState'> & { movementData: MovementData}) {
   const { player } = localState;
+  const { map: mapData } = gameState;
   
   const {
     camera,
@@ -26,6 +26,10 @@ export default function CameraControls({ localState, updatePlayer, movementData,
 
   const checkCollision = (newPosition) => {
     const buffer = 0.2;
+
+    if (!mapData.length) {
+      return false; // No map data, no collision
+    }
 
     // Check the area around the camera, including the buffer
     for (let x = Math.round(newPosition.x - buffer); x <= Math.round(newPosition.x + buffer); x++) {

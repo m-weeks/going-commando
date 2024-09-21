@@ -10,6 +10,7 @@ export default ({ children }: { children: (gameData: GameData) => void }) => {
     started: false,
     reloadTimer: null,
     winner: null,
+    map: [],
   });
 
   // Stores client information and the local players state. We will rely on this as the source of truth for the client. This is to prevent rubberbanding movement due to ping

@@ -20,7 +20,7 @@ function App() {
                     <Canvas style={{ width: '100vw', height: '100vh' }} shadows>
                       <CameraControls localState={localState} updatePlayer={updatePlayer} movementData={movementData} gameState={gameState} />
                       {/* <ambientLight intensity={2} /> */}
-                      <Map />
+                      <Map mapData={gameState.map} />
                       {
                         _.map(gameState.players, (player, playerId) => {
                           if (playerId === localState.clientId) {
