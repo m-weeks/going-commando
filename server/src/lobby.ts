@@ -1,7 +1,7 @@
 import _ from 'lodash';
 import { LOBBY_SIZE } from './constants';
 import { initializePlayer, Player } from './player';
-import { broadcastMsg } from '.';
+import { broadcastMsg, singleMsg } from '.';
 
 type Lobby = {
   id: string,
@@ -11,7 +11,7 @@ type Lobby = {
 type GameState = {
   players: Record<string, Player>,
   started: boolean,
-  winner?: string,
+  winner: string | null,
   reloadTimer: number | null
 }
 
@@ -25,7 +25,7 @@ const createLobby = (): Lobby => {
     gameState: {
       players: {},
       started: false,
-      winner: undefined,
+      winner: null,
       reloadTimer: null,
     }
   };
@@ -37,14 +37,14 @@ export const getLobby = (clientId: string): Lobby | undefined => {
   return Object.values(lobbies).find((lobby) => clientId in lobby.gameState.players);
 }
 
-export const addToLobby = (clientId: string) => {
+export const addToLobby = (clientId: string, player?: Player) => {
   // Find a lobby with room for the player
   let lobby = Object.values(lobbies).find((lobby) => Object.keys(lobby.gameState.players).length < LOBBY_SIZE && !lobby.gameState.started);
   if (!lobby) { // if one doesn't exist, create a new lobby
     lobby = createLobby();
   }
 
-  lobby.gameState.players[clientId] = initializePlayer();
+  lobby.gameState.players[clientId] = player ?? initializePlayer();
 
   if (Object.values(lobby.gameState.players).length >= LOBBY_SIZE) {
     lobby.gameState.started = true;
@@ -52,6 +52,8 @@ export const addToLobby = (clientId: string) => {
 
   console.log('PLAYER JOINED', clientId)
   console.log('NUM PLAYERS', Object.keys(lobby.gameState.players).length);
+
+  return lobby;
 }
 
 export const removeFromLobby = (clientId: string) => {
@@ -171,7 +173,38 @@ export const fire = (clientId) => {
 
   const livingPlayers = Object.entries(lobby.gameState.players).filter(([id, player]) => player.health > 0);
 
-  if (livingPlayers.length <= 1) {
+  if (livingPlayers.length === 1) {
     lobby.gameState.winner = livingPlayers[0][0]; // award victory to last living player
+  } else if (livingPlayers.length === 0) {
+    delete lobbies[lobby.id];
+    console.log(`LOBBY ${lobby.id} DELETED`);
   }
+}
+
+export const rematch = (clientId) => {
+  const lobby = getLobby(clientId);
+  if (!lobby || !lobby.gameState.winner) return;
+
+  const player = lobby.gameState.players[clientId];
+  if (!player) {
+    return;
+  }
+
+  const playerData: Player = {
+    ...initializePlayer(),
+  }
+
+  if (lobby.gameState.winner === clientId) {
+    playerData.score = (player.score ?? 0) + 1;
+  }
+
+  removeFromLobby(clientId);
+  addToLobby(clientId, playerData);
+
+  singleMsg(clientId, {
+    type: 'RESET_PLAYER',
+    data: {
+      player: playerData,
+    }
+  })
 }

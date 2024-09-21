@@ -7,7 +7,7 @@ import { GameData } from '../types';
 import { CAMERA_ANGLE, CAMERA_HEIGHT, CAMERA_OFFSET, MOVE_SPEED, ROTATION_SPEED } from '../constants'
 import { MovementData } from './controls/Controls';
 
-export default function CameraControls({ localState, updatePlayer, movementData }: Pick<GameData, 'localState' | 'updatePlayer'> & { movementData: MovementData}) {
+export default function CameraControls({ localState, updatePlayer, movementData, gameState }: Pick<GameData, 'localState' | 'updatePlayer' | 'gameState'> & { movementData: MovementData}) {
   const { player } = localState;
   
   const {
@@ -48,6 +48,9 @@ export default function CameraControls({ localState, updatePlayer, movementData 
   const { x, y, speed, rotateLeft, rotateRight, rotationSpeed } = movementData;
 
   useFrame((_state, delta) => {
+    if (gameState.winner) {
+      return;
+    }
     const speedPerFrame = MOVE_SPEED * delta * speed;
     const rotationPerFrame = ROTATION_SPEED * delta * rotationSpeed;
     const forwardDirection = new Vector3();

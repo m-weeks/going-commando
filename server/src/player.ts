@@ -4,6 +4,7 @@ export type Player = {
   angle: number,
   ammo: number,
   health: number,
+  score?: number,
 }
 
 const map = [

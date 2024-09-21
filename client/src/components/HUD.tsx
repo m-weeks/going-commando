@@ -1,14 +1,23 @@
-import { GameState, Player } from "../types";
+import { GameData, GameState, LocalState } from "../types";
 import shellImage from './assets/shell.png'
+import Ellipsis from "./Ellipsis";
 
-const HUD = ({ player, gameState } : { player: Player, gameState: GameState }) => {
+const HUD = ({ localState, gameState, sendMessage } : { localState: LocalState, gameState: GameState } & Pick<GameData, 'sendMessage'>) => {
+    const { player } = localState;
+
+
+    const won = gameState.winner === localState.clientId;
+    const handleRematchClick = () => {
+        sendMessage('REMATCH', null);
+    }
+
     return (
         <>
             {
                 (gameState.reloadTimer) && (
                     <div style={{ position: 'fixed', zIndex: 2, top: '50px', width: '100%', color: 'white', textAlign: 'center', fontSize: '24px' }}>
                         <div>
-                            Reloading in...
+                            Reloading in<Ellipsis/>
                         </div>
                         {gameState.reloadTimer}
                     </div>
@@ -33,6 +42,25 @@ const HUD = ({ player, gameState } : { player: Player, gameState: GameState }) =
                     }
                 </div>
             </div>
+            {
+                gameState.winner && (
+                    <div style={{ fontSize: '72px', position: 'fixed', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', textAlign: 'center', zIndex: 4, color: 'white' }}>
+                        {won ? 'You win!' : 'You lose!'}
+                        <div>
+                            <button style={{ fontSize: '32px', backgroundColor: 'white', padding: '20px', borderRadius: '15px' }} onClick={handleRematchClick}>
+                                RUN IT BACK
+                            </button>
+                        </div>
+                    </div>
+                )
+            }
+            {
+                player.score && (
+                    <div style={{ position: 'fixed', zIndex: 2, top: '50px', right: '50px', color: 'white', fontSize: '24px' }}>
+                        Score: {player.score}
+                    </div>
+                )
+            }
         </>
     )
 }

@@ -14,12 +14,11 @@ function App() {
           {
             (({ gameState, localState, updatePlayer, sendMessage }) => (
               <>
-                {/* Show hud data from most up-to date player info from server */}
-                <HUD player={localState.player} gameState={gameState} /> 
+                <HUD localState={localState} gameState={gameState} sendMessage={sendMessage} /> 
                 <Controls sendMessage={sendMessage}>
                   {({ movementData }) => (
                     <Canvas style={{ width: '100vw', height: '100vh' }} shadows>
-                      <CameraControls localState={localState} updatePlayer={updatePlayer} movementData={movementData} />
+                      <CameraControls localState={localState} updatePlayer={updatePlayer} movementData={movementData} gameState={gameState} />
                       {/* <ambientLight intensity={2} /> */}
                       <Map />
                       {

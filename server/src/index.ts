@@ -2,7 +2,7 @@ import express from 'express';
 import _ from 'lodash';
 import { createServer } from 'http';
 import { WebSocketServer, WebSocket } from 'ws';
-import { addToLobby, fire, getLobby, lobbies, removeFromLobby, updatePlayerState } from './lobby';
+import { addToLobby, fire, getLobby, lobbies, rematch, removeFromLobby, updatePlayerState } from './lobby';
 
 const app = express();
 const server = createServer(app);
@@ -28,6 +28,9 @@ wss.on('connection', (ws) => {
       case 'FIRE':
         fire(clientId);
         break;
+      case 'REMATCH':
+        rematch(clientId);
+        break;
     }
   });
 
@@ -39,6 +42,16 @@ wss.on('connection', (ws) => {
     removeFromLobby(clientId);
   });
 });
+
+export const singleMsg = (clientId: string, data = {}) => {
+  const ws = clients[clientId];
+  if (!ws) return;
+
+  ws.send(JSON.stringify({
+    ...data,
+    clientId,
+  }));
+}
 
 export const broadcastMsg = (lobbyId: string, data = {}, excludedClients: string[] = []) => {
   _.forEach(clients, (ws, clientId) => {

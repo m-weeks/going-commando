@@ -1,10 +1,16 @@
 import { useEffect, useState, useRef, useCallback } from 'react'
 import _ from 'lodash';
-import { GameData, GameState, LocalState } from '../types';
+import { GameData, GameState, LocalState, Player } from '../types';
+import Ellipsis from '../components/Ellipsis';
 
 export default ({ children }: { children: (gameData: GameData) => void }) => {
   // Stores the main game state, including all players
-  const [gameState, setGameState] = useState<GameState>({ players: {}, started: false });
+  const [gameState, setGameState] = useState<GameState>({
+    players: {},
+    started: false,
+    reloadTimer: null,
+    winner: null,
+  });
 
   // Stores client information and the local players state. We will rely on this as the source of truth for the client. This is to prevent rubberbanding movement due to ping
   const [localState, setLocalState] = useState<Partial<LocalState> & { loaded: boolean }>({
@@ -74,6 +80,15 @@ export default ({ children }: { children: (gameData: GameData) => void }) => {
         
       } else if (msg.type === 'FIRED') {
         window.dispatchEvent(new CustomEvent('fire', { detail: { clientId: msg.data.clientId } }));
+      } else if (msg.type === 'RESET_PLAYER') {
+        const { data } = msg as { data: { player: Player } }
+        setLocalState((oldState) => ({
+          ...oldState,
+          player: {
+            ...oldState.player,
+            ...data.player,
+          },
+        }))
       }
     }
   
@@ -119,20 +134,11 @@ export default ({ children }: { children: (gameData: GameData) => void }) => {
 
   if (!gameState.started) {
     return (
-      <div style={{ textAlign: 'center' }}>
-        Waiting for players...
+      <div style={{ height: '100vh', width: '100vw', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '32px' }}>
+        Waiting for players<Ellipsis/>
       </div>
     )
   }
-
-  if (gameState.winner) {
-    return (
-      <div style={{ textAlign: 'center' }}>
-        {gameState.winner === localState.clientId ? 'You win!' : 'You lose!'}
-      </div>
-    )
-  }
-
 
   if (disconnected) {
     return <div>Disconnected</div>

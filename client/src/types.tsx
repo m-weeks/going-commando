@@ -4,6 +4,7 @@ export type Player = {
   angle: number,
   ammo: number,
   health: number,
+  score?: number,
 }
 
 export type Projectile = {
@@ -15,7 +16,7 @@ export type Projectile = {
 export type GameState = {
   players: Record<string, Player>,
   started: boolean,
-  winner?: string
+  winner: string | null
   reloadTimer: number | null
 }
 
