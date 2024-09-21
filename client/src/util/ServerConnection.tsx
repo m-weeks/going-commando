@@ -4,7 +4,7 @@ import { GameData, GameState, LocalState } from '../types';
 
 export default ({ children }: { children: (gameData: GameData) => void }) => {
   // Stores the main game state, including all players
-  const [gameState, setGameState] = useState<GameState>({ players: {} });
+  const [gameState, setGameState] = useState<GameState>({ players: {}, started: false });
 
   // Stores client information and the local players state. We will rely on this as the source of truth for the client. This is to prevent rubberbanding movement due to ping
   const [localState, setLocalState] = useState<Partial<LocalState> & { loaded: boolean }>({
@@ -116,6 +116,23 @@ export default ({ children }: { children: (gameData: GameData) => void }) => {
   if (!localState.loaded || !localState.player || !localState.clientId) {
     return null;
   }
+
+  if (!gameState.started) {
+    return (
+      <div style={{ textAlign: 'center' }}>
+        Waiting for players...
+      </div>
+    )
+  }
+
+  if (gameState.winner) {
+    return (
+      <div style={{ textAlign: 'center' }}>
+        {gameState.winner === localState.clientId ? 'You win!' : 'You lose!'}
+      </div>
+    )
+  }
+
 
   if (disconnected) {
     return <div>Disconnected</div>

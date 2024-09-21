@@ -13,7 +13,9 @@ export type Projectile = {
 }
 
 export type GameState = {
-  players: Record<string, Player>
+  players: Record<string, Player>,
+  started: boolean,
+  winner?: string
 }
 
 export type LocalState = {

@@ -9,7 +9,9 @@ type Lobby = {
 }
 
 type GameState = {
-  players: Record<string, Player>
+  players: Record<string, Player>,
+  started: boolean,
+  winner?: string,
 }
 
 export const lobbies: Record<string, Lobby> = {
@@ -21,6 +23,8 @@ const createLobby = (): Lobby => {
     id,
     gameState: {
       players: {},
+      started: false,
+      winner: undefined,
     }
   };
   lobbies[id] = lobby;
@@ -33,12 +37,16 @@ export const getLobby = (clientId: string): Lobby | undefined => {
 
 export const addToLobby = (clientId: string) => {
   // Find a lobby with room for the player
-  let lobby = Object.values(lobbies).find((lobby) => Object.keys(lobby.gameState.players).length < LOBBY_SIZE);
+  let lobby = Object.values(lobbies).find((lobby) => Object.keys(lobby.gameState.players).length < LOBBY_SIZE && !lobby.gameState.started);
   if (!lobby) { // if one doesn't exist, create a new lobby
     lobby = createLobby();
   }
 
   lobby.gameState.players[clientId] = initializePlayer();
+
+  if (Object.values(lobby.gameState.players).length >= LOBBY_SIZE) {
+    lobby.gameState.started = true;
+  }
 
   console.log('PLAYER JOINED', clientId)
   console.log('NUM PLAYERS', Object.keys(lobby.gameState.players).length);
@@ -53,6 +61,8 @@ export const removeFromLobby = (clientId: string) => {
   if (Object.keys(lobby.gameState.players).length === 0) {
     delete lobbies[lobby.id];
     console.log(`LOBBY ${lobby.id} DELETED`);
+  } else if (Object.keys(lobby.gameState.players).length === 1) { // award victory to remaining player
+    lobby.gameState.winner = Object.keys(lobby.gameState.players)[0];
   }
 }
 
@@ -137,4 +147,10 @@ export const fire = (clientId) => {
       clientId
     }
   });
+
+  const livingPlayers = Object.entries(lobby.gameState.players).filter(([id, player]) => player.health > 0);
+
+  if (livingPlayers.length <= 1) {
+    lobby.gameState.winner = livingPlayers[0][0]; // award victory to last living player
+  }
 }
