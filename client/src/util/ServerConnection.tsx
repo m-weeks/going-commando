@@ -19,6 +19,16 @@ export default ({ children }: { children: (gameData: GameData) => void }) => {
 
   const [disconnected, setDisconnected] = useState(false);
 
+  const updatePlayer = (newValues) => {
+    setLocalState((oldState) => ({
+      ...oldState,
+      player: {
+        ...(_.cloneDeep(oldState.player)),
+        ...newValues
+      }
+    }))
+  }
+
   useEffect(() => {
     const socket = new WebSocket(import.meta.env.VITE_WEBSOCKET_SERVER);
     socketRef.current = socket;
@@ -55,10 +65,13 @@ export default ({ children }: { children: (gameData: GameData) => void }) => {
 
           if (!result.player) {
             result.player = msg.data.players[msg.clientId];
+          } else {
+            result.player = { ...result.player, ...(_.omit(msg.data.players[msg.clientId], ['x', 'z', 'angle'])) };
           }
 
           return result;
         })
+        
       } else if (msg.type === 'FIRED') {
         window.dispatchEvent(new CustomEvent('fire', { detail: { clientId: msg.data.clientId } }));
       }
@@ -87,16 +100,6 @@ export default ({ children }: { children: (gameData: GameData) => void }) => {
       }
     ))
   }, [])
-  
-  const updatePlayer = (newValues) => {
-    setLocalState((oldState) => ({
-      ...oldState,
-      player: {
-        ...(_.cloneDeep(oldState.player)),
-        ...newValues
-      }
-    }))
-  }
 
   useEffect(() => {
     const interval = setInterval(() => {

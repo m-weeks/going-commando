@@ -2,7 +2,8 @@ export type Player = {
   x: number,
   z: number,
   angle: number,
-  ammo: 1,
+  ammo: number,
+  health: number,
 }
 
 export type Projectile = {

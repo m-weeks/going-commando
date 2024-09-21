@@ -13,7 +13,7 @@ export type MovementData = {
   rotationSpeed: number;
 };
 
-const Controls = ({ clientId, children, sendMessage }: { clientId: string, children: ({ movementData } : { movementData: MovementData}) => ReactNode } & Pick<GameData, 'sendMessage'>) => {
+const Controls = ({ children, sendMessage }: { children: ({ movementData } : { movementData: MovementData}) => ReactNode } & Pick<GameData, 'sendMessage'>) => {
   // Mostly just exists for debugging purposes
   const keyboardMovementData = useKeyboardControls();
 
@@ -109,8 +109,8 @@ const Controls = ({ clientId, children, sendMessage }: { clientId: string, child
         </button>
         <Joystick
           size={150}
-          baseColor="rgba(0,0,0,0.5)"
-          stickColor="rgba(255,255,255,0.8)"
+          baseColor="#624faf"
+          stickColor="#fff"
           move={handleRotate}
           stop={handleStopRotate}
           throttle={100}
@@ -122,8 +122,8 @@ const Controls = ({ clientId, children, sendMessage }: { clientId: string, child
       <div style={{ position: 'fixed', zIndex: '1', bottom: '20vh', left: '10vw', opacity: 0.5 }}>
         <Joystick
           size={150}
-          baseColor="rgba(0,0,0,0.5)"
-          stickColor="rgba(255,255,255,0.8)"
+          baseColor="#624faf"
+          stickColor="#fff"
           move={handleMove}
           stop={handleStop}
           throttle={100}

@@ -5,6 +5,7 @@ import Map from './components/Map'
 import CameraControls from './components/CameraControls';
 import Avatar from './components/Avatar';
 import Controls from './components/controls/Controls';
+import HUD from './components/HUD';
 
 function App() {
   return (
@@ -13,7 +14,9 @@ function App() {
           {
             (({ gameState, localState, updatePlayer, sendMessage }) => (
               <>
-                <Controls sendMessage={sendMessage} clientId={localState.clientId}>
+                {/* Show hud data from most up-to date player info from server */}
+                <HUD player={localState.player} /> 
+                <Controls sendMessage={sendMessage}>
                   {({ movementData }) => (
                     <Canvas style={{ width: '100vw', height: '100vh' }} shadows>
                       <CameraControls localState={localState} updatePlayer={updatePlayer} movementData={movementData} />
