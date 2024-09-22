@@ -45,6 +45,5 @@ const maps = [
 export const getMap = () => {
     const randomIndex = Math.floor(Math.random() * maps.length);
     const map = maps[randomIndex];
-    console.log('GETTING MAP', map)
     return map;
 }

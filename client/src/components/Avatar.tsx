@@ -9,28 +9,60 @@ const Avatar = ({ player, currentPlayer = false, clientId, curPlayer }: { player
   const { moving, angle } = player
 
   const [firing, setFiring] = useState(false);
+  const [iFrame, setIFrame] = useState(false);
 
   useEffect(() => {
-    let timeout;
+    let timeouts: number[] = [];
     const handleFire = (event: CustomEvent) => {
       if (event.detail.clientId !== clientId) {
         return
       }
       
       setFiring(true);
-      timeout = setTimeout(() => {
+      timeouts.push(setTimeout(() => {
         setFiring(false);
-      }, 250);
+      }, 250));
     }
     // @ts-ignore
     window.addEventListener('fire', handleFire);
 
+    const handleDamage = (event: CustomEvent) => {
+      if (event.detail.playerId !== clientId) {
+        return
+      }
+      setIFrame(true);
+      timeouts.push(setTimeout(() => {
+        setIFrame(false);
+      }, 500));
+    }
+    // @ts-ignore
+    window.addEventListener('damageTaken', handleDamage);
+
     return () => {
       // @ts-ignore
       window.removeEventListener('fire', handleFire);
-      clearTimeout(timeout);
+      // @ts-ignore
+      window.removeEventListener('damageTaken', handleDamage);
+      timeouts.forEach((timeout) => clearTimeout(timeout));
     };
   }, [clientId]);
+
+  const [opacity, setOpacity] = useState(1);
+
+  useEffect(() => {
+    let interval;
+    if (iFrame) {
+      interval = setInterval(() => {
+        setOpacity((oldOpacity) => oldOpacity === 1 ? 0 : 1);
+      }, 50)
+    }
+    if (!iFrame) {
+      setOpacity(1);
+    }
+    return () => {
+      clearInterval(interval);
+    }
+  }, [iFrame])
 
   const [stepFrame, setStepFrame] = useState(1);
   useEffect(() => {
@@ -51,7 +83,6 @@ const Avatar = ({ player, currentPlayer = false, clientId, curPlayer }: { player
     diff = (diff +  360) % 360;
     if (diff > 45 && diff < 135) {
         if (firing) {
-          console.log('right shoot');
           return avatarData.right.shoot;
         }
       if (moving) { 
@@ -61,7 +92,6 @@ const Avatar = ({ player, currentPlayer = false, clientId, curPlayer }: { player
     }
     if (diff > 135 && diff < 225) {
         if (firing) {
-          console.log('front shoot');
           return avatarData.front.shoot;
         }
       if (moving) {
@@ -71,7 +101,6 @@ const Avatar = ({ player, currentPlayer = false, clientId, curPlayer }: { player
     }
     if (diff > 225 && diff < 315) {
         if (firing) {
-          console.log('left shoot');
           return avatarData.left.shoot;
         }
       if (moving) { 
@@ -115,7 +144,7 @@ const Avatar = ({ player, currentPlayer = false, clientId, curPlayer }: { player
         scale={[0.75, 0.9, 0.75]}
       >
         <planeGeometry args={[1.5, 1.125]} />
-        <meshStandardMaterial map={texture} transparent />
+        <meshStandardMaterial map={texture} transparent opacity={opacity} />
       </mesh>
       
       {

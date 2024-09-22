@@ -169,10 +169,12 @@ export const fire = (clientId) => {
         clearInterval(timerInterval);
         lobby.gameState.reloadTimer = null;
         _.forEach(lobby.gameState.players, (_, playerId) => {
-          lobby.gameState.players[playerId].ammo = 1;
-          broadcastMsg(lobby.id, {
-            type: 'RELOADED'
-          });
+          if (!lobby.gameState.winner) {
+            lobby.gameState.players[playerId].ammo = 1;
+            broadcastMsg(lobby.id, {
+              type: 'RELOADED'
+            });
+          }
         })
       }
     }, 1000);
