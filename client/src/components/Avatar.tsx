@@ -4,6 +4,7 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import { Player } from '../types';
 import FiringCone from './FiringCone';
 import avatarData from './assets/avatar';
+import HealthBar from './HealthBar';
 
 const Avatar = ({ player, currentPlayer = false, clientId, curPlayer }: { player: Player, currentPlayer?: boolean, clientId: string, curPlayer: Player }) => {
   const { moving, angle } = player
@@ -169,6 +170,12 @@ const Avatar = ({ player, currentPlayer = false, clientId, curPlayer }: { player
       <primitive object={targetRef.current} />
 
       <FiringCone player={player} clientId={clientId} />
+
+      {
+        !currentPlayer && (
+          <HealthBar player={player} />
+        )
+      }
     </>
   );
 };
