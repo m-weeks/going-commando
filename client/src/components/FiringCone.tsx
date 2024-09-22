@@ -28,7 +28,7 @@ const FiringCone = ({ player, clientId }: { player: Player, clientId: string }) 
     };
   }, [clientId]);
 
-  useFrame((state, delta) => {
+  useFrame((_, delta) => {
     if (firing) {
       setElapsedTime((prev) => prev + delta * 1000);
     }

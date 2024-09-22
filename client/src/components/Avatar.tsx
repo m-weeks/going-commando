@@ -1,7 +1,7 @@
 import { useFrame } from '@react-three/fiber';
 import { Object3D } from 'three';
 import { Player } from '../types';
-import { useEffect, useRef, useState } from 'react';
+import { useRef } from 'react';
 import FiringCone from './FiringCone';
 
 const Avatar = ({ player, currentPlayer = false, clientId }: { player: Player, currentPlayer?: boolean, clientId: string }) => {

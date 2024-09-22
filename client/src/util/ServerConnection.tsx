@@ -40,7 +40,7 @@ export default ({ children }: { children: (gameData: GameData) => void }) => {
     const socket = new WebSocket(import.meta.env.VITE_WEBSOCKET_SERVER);
     socketRef.current = socket;
 
-    socket.onopen = (e) => {
+    socket.onopen = () => {
       console.log('Connected');
       setLocalState((oldState) => ({
         ...oldState,
@@ -93,12 +93,12 @@ export default ({ children }: { children: (gameData: GameData) => void }) => {
       }
     }
   
-    socket.onclose = (e) => {
+    socket.onclose = () => {
       setDisconnected(true);
       console.log('Connection closed');
     }
   
-    socket.onerror = (e) => {
+    socket.onerror = () => {
       console.error('Socket error');
     }
 
