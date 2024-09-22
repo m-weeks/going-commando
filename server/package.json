@@ -2,7 +2,7 @@
   "name": "gamejam-backend",
   "version": "0.0.1",
   "description": "Backend for the gamejam",
-  "type": "commonjs",
+  "type": "module",
   "scripts": {
     "dev": "nodemon --exec node --loader ts-node/esm ./src/index.ts",
     "serve": "node ./dist/index.js",

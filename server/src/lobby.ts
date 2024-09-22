@@ -1,8 +1,8 @@
 import _ from 'lodash';
-import { LOBBY_SIZE } from './constants';
-import { initializePlayer, Player } from './player';
-import { broadcastMsg, singleMsg } from '.';
-import { getMap } from './map';
+import { LOBBY_SIZE } from './constants.js';
+import { initializePlayer, Player } from './player.js';
+import { broadcastMsg, singleMsg } from './index.js';
+import { getMap } from './map.js';
 
 type Lobby = {
   id: string,

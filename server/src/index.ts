@@ -2,7 +2,7 @@ import express from 'express';
 import _ from 'lodash';
 import { createServer } from 'http';
 import { WebSocketServer, WebSocket } from 'ws';
-import { addToLobby, fire, getLobby, lobbies, rematch, removeFromLobby, updatePlayerState } from './lobby';
+import { addToLobby, fire, getLobby, lobbies, rematch, removeFromLobby, updatePlayerState } from './lobby.js';
 
 const app = express();
 const server = createServer(app);
