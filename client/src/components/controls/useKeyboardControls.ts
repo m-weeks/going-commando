@@ -1,7 +1,7 @@
 import { useEffect, useRef } from "react";
 import { MovementData } from "./Controls";
 
-export const useKeyboardControls = () : MovementData => {
+export const useKeyboardControls = ({ handleFire }: { handleFire: () => void }) : MovementData => {
   const movementDataRef = useRef<MovementData>({
     x: 0,
     y: 0,
@@ -33,7 +33,7 @@ export const useKeyboardControls = () : MovementData => {
         movementDataRef.current.x = 1;
         break;
       case 'Space':
-        
+        handleFire();
         break;
       default:
         break;

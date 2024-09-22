@@ -3,6 +3,7 @@ import { useKeyboardControls } from './useKeyboardControls';
 import { ReactNode, useRef, useState } from 'react';
 import { IJoystickUpdateEvent } from 'react-joystick-component/build/lib/Joystick';
 import { GameData } from '../../types';
+import { isTouchDevice } from '../../util/isTouchDevices';
 
 export type MovementData = {
   x: number;
@@ -15,7 +16,7 @@ export type MovementData = {
 
 const Controls = ({ children, sendMessage }: { children: ({ movementData } : { movementData: MovementData}) => ReactNode } & Pick<GameData, 'sendMessage'>) => {
   // Mostly just exists for debugging purposes
-  const keyboardMovementData = useKeyboardControls();
+  const keyboardMovementData = useKeyboardControls({ handleFire: () => sendMessage('FIRE', {}) });
 
   const joystickMovementData = useRef<MovementData>({
     x: 0,
@@ -102,32 +103,36 @@ const Controls = ({ children, sendMessage }: { children: ({ movementData } : { m
         })
       }
 
-      <div style={{ position: 'fixed', zIndex: '1', bottom: '20vh', right: '10vw', opacity: 0.5 }}>
-        <button className={`fireButton ${clicked ? 'clicked' : ''}`} onPointerDown={handleFire} onPointerUp={handleStopFire}>
-          FIRE!
-        </button>
-        <Joystick
-          size={75}
-          baseColor="#707070"
-          stickColor="#fff"
-          move={handleRotate}
-          stop={handleStopRotate}
-          throttle={100}
-          controlPlaneShape={JoystickShape.AxisX}
-          baseShape={JoystickShape.Square}
-          stickShape={JoystickShape.Square}
-        />
-      </div>
-      <div style={{ position: 'fixed', zIndex: '1', bottom: '20vh', left: '10vw', opacity: 0.5 }}>
-        <Joystick
-          size={75}
-          baseColor="#707070"
-          stickColor="#fff"
-          move={handleMove}
-          stop={handleStop}
-          throttle={100}
-        />
-      </div>
+      {isTouchDevice() && (
+        <>
+          <div style={{ position: 'fixed', zIndex: '1', bottom: '20vh', right: '10vw', opacity: 0.5 }}>
+            <button className={`fireButton ${clicked ? 'clicked' : ''}`} onPointerDown={handleFire} onPointerUp={handleStopFire}>
+              FIRE!
+            </button>
+            <Joystick
+              size={75}
+              baseColor="#707070"
+              stickColor="#fff"
+              move={handleRotate}
+              stop={handleStopRotate}
+              throttle={100}
+              controlPlaneShape={JoystickShape.AxisX}
+              baseShape={JoystickShape.Square}
+              stickShape={JoystickShape.Square}
+            />
+          </div>
+          <div style={{ position: 'fixed', zIndex: '1', bottom: '20vh', left: '10vw', opacity: 0.5 }}>
+            <Joystick
+              size={75}
+              baseColor="#707070"
+              stickColor="#fff"
+              move={handleMove}
+              stop={handleStop}
+              throttle={100}
+            />
+          </div>
+        </>
+      )}
     </>
   );
 };
