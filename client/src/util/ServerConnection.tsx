@@ -146,7 +146,12 @@ export default ({ children }: { children: (gameData: GameData) => void }) => {
             Going Commando
           </div>
           <div style={{ fontSize: '24px' }}>
-            Waiting for players<Ellipsis/>
+            <div>
+              Waiting for another player<Ellipsis/>
+            </div>
+            <div style={{ fontSize: '18px' }}>
+              Try asking a friend to play with you!
+            </div>
           </div>
         </div>
       </div>
