@@ -73,7 +73,7 @@ const FiringCone = ({ player, clientId }: { player: Player, clientId: string }) 
         const verticalSpread = (Math.random() - 0.5) * PROJECTILE_SPREAD; // Random vertical spread
         newProjectiles.push({
           id: _.uniqueId('projectile_'),
-          origin: new Vector3(playerRef.current.x, 0.5, playerRef.current.z),
+          origin: new Vector3(playerRef.current.x, 0.25, playerRef.current.z),
           horizontalAngle: playerRef.current.angle + horizontalSpread,
           verticalAngle: verticalSpread,
           color: new Color(PROJECTILE_COLORS[i % PROJECTILE_COLORS.length]),
@@ -113,20 +113,6 @@ const FiringCone = ({ player, clientId }: { player: Player, clientId: string }) 
         opacity={opacity}
       />
     ))
-  )
-  
-  return (
-    <mesh
-      position={[
-        player.x - Math.sin(player.angle),
-        0,
-        player.z - Math.cos(player.angle),
-      ]}
-      rotation={[Math.PI / 2, 0, player.angle * -1]}
-    >
-      <coneGeometry args={[1, 2, 8]} />
-      <meshStandardMaterial color="red" opacity={opacity} transparent />
-    </mesh>
   )
 }
 
