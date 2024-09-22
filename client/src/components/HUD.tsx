@@ -15,7 +15,7 @@ const HUD = ({ localState, gameState, sendMessage } : { localState: LocalState, 
         <>
             {
                 (gameState.reloadTimer) && (
-                    <div style={{ position: 'fixed', zIndex: 2, top: '50px', width: '100%', color: 'white', textAlign: 'center', fontSize: '24px' }}>
+                    <div style={{ position: 'fixed', zIndex: 2, top: '25px', width: '100%', color: 'white', textAlign: 'center', fontSize: '12px' }}>
                         <div>
                             Reloading in<Ellipsis/>
                         </div>
@@ -23,11 +23,11 @@ const HUD = ({ localState, gameState, sendMessage } : { localState: LocalState, 
                     </div>
                 )
             }
-            <div style={{ position: 'fixed', zIndex: 2, top: '50px', left: '50px', display: 'flex', alignItems: 'center', height: 40 }}>
-                <div style={{ position: 'relative', width: 100, marginRight: '10px', height: 40 }}>
-                    <div style={{ backgroundColor: 'red', width: 100, height: 25, position: 'absolute', top: 7.5 }}>
+            <div style={{ position: 'fixed', zIndex: 2, top: '25px', left: '25px', display: 'flex', alignItems: 'center', height: 20 }}>
+                <div style={{ position: 'relative', width: 100, marginRight: '5px', height: 20 }}>
+                    <div style={{ backgroundColor: 'red', width: 100, height: 12, position: 'absolute', top: 5 }}>
                     </div>
-                    <div style={{ backgroundColor: 'green', width: Math.max(player?.health ?? 100, 0), height: 25, position: 'absolute',  top: 7.5 }}>
+                    <div style={{ backgroundColor: 'green', width: Math.max(player?.health ?? 100, 0), height: 12, position: 'absolute',  top: 5 }}>
                     </div>
                 </div>
                 <div>
@@ -36,7 +36,7 @@ const HUD = ({ localState, gameState, sendMessage } : { localState: LocalState, 
                             <img
                                 key={i}
                                 src={shellImage}
-                                style={{ height: '40px', marginRight: '5px' }}
+                                style={{ height: '20px', marginRight: '5px' }}
                             />
                         ))
                     }
@@ -44,7 +44,7 @@ const HUD = ({ localState, gameState, sendMessage } : { localState: LocalState, 
             </div>
             {
                 gameState.winner && (
-                    <div style={{ fontSize: '72px', position: 'fixed', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', textAlign: 'center', zIndex: 4, color: 'white' }}>
+                    <div style={{ fontSize: '36px', position: 'fixed', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', textAlign: 'center', zIndex: 4, color: 'white' }}>
                         {won ? 'You win!' : 'You lose!'}
                         <div>
                             <button style={{ fontSize: '32px', backgroundColor: 'white', padding: '20px', borderRadius: '15px' }} onClick={handleRematchClick}>
@@ -56,7 +56,7 @@ const HUD = ({ localState, gameState, sendMessage } : { localState: LocalState, 
             }
             {
                 player.score && (
-                    <div style={{ position: 'fixed', zIndex: 2, top: '50px', right: '50px', color: 'white', fontSize: '24px' }}>
+                    <div style={{ position: 'fixed', zIndex: 2, top: '25px', right: '25px', color: 'white', fontSize: '12px' }}>
                         Score: {player.score}
                     </div>
                 )

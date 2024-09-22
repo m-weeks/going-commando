@@ -108,7 +108,7 @@ const Controls = ({ children, sendMessage }: { children: ({ movementData } : { m
           FIRE!
         </button>
         <Joystick
-          size={150}
+          size={75}
           baseColor="#624faf"
           stickColor="#fff"
           move={handleRotate}
@@ -121,7 +121,7 @@ const Controls = ({ children, sendMessage }: { children: ({ movementData } : { m
       </div>
       <div style={{ position: 'fixed', zIndex: '1', bottom: '20vh', left: '10vw', opacity: 0.5 }}>
         <Joystick
-          size={150}
+          size={75}
           baseColor="#624faf"
           stickColor="#fff"
           move={handleMove}
