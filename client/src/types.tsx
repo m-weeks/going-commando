@@ -5,6 +5,7 @@ export type Player = {
   ammo: number,
   health: number,
   score?: number,
+  moving: boolean,
 }
 
 export type Projectile = {

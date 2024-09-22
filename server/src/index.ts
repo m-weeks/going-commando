@@ -22,7 +22,7 @@ wss.on('connection', (ws) => {
         addToLobby(clientId);
         break;
       case 'PLAYER_SYNC':
-        const newPlayerData = _.pick(msg.data, ['x', 'z', 'angle']);
+        const newPlayerData = _.pick(msg.data, ['x', 'z', 'angle', 'moving']);
         updatePlayerState(clientId, newPlayerData);
         break;
       case 'FIRE':

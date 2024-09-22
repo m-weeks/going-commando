@@ -1,10 +1,73 @@
-import { useFrame } from '@react-three/fiber';
-import { Object3D } from 'three';
+import { useFrame, useLoader } from '@react-three/fiber';
+import { Mesh, Object3D, TextureLoader } from 'three';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { Player } from '../types';
-import { useRef } from 'react';
 import FiringCone from './FiringCone';
+import avatarData from './assets/avatar';
 
-const Avatar = ({ player, currentPlayer = false, clientId }: { player: Player, currentPlayer?: boolean, clientId: string }) => {
+const Avatar = ({ player, currentPlayer = false, clientId, curPlayer }: { player: Player, currentPlayer?: boolean, clientId: string, curPlayer: Player }) => {
+  const { moving, angle } = player
+
+  const [stepFrame, setStepFrame] = useState(1);
+  useEffect(() => {
+    let interval;
+    if (moving) {
+      interval = setInterval(() => {
+        setStepFrame((oldFrame) => oldFrame === 1 ? 2 : 1);
+      }, 200)
+    }
+
+    return () => {
+      clearInterval(interval);
+    }
+  }, [moving])
+
+  const avatarType = useMemo(() => {
+    let diff = (curPlayer.angle - angle) * (180 / Math.PI);
+    diff = (diff +  360) % 360;
+    if (diff > 45 && diff < 135) {
+      //   if (punching) {
+      //     return avatar.right.punch;
+      //   }
+      if (moving) { 
+        return avatarData.right.step[stepFrame - 1];
+      }
+      return avatarData.right.idle;
+    }
+    if (diff > 135 && diff < 225) {
+      //   if (punching) {
+      //     return punchTypeRef.current;
+      //   }
+      if (moving) {
+        return avatarData.front.step[stepFrame - 1];
+      }
+      return avatarData.front.idle;
+    }
+    if (diff > 225 && diff < 315) {
+      //   if (punching) {
+      //     return avatar.left.punch;
+      //   }
+      if (moving) { 
+        return avatarData.left.step[stepFrame - 1];
+      }
+      return avatarData.left.idle;
+    }
+    if (moving) {
+      return avatarData.behind.step[stepFrame - 1];
+    }
+    return avatarData.behind.idle;
+  }, [angle, curPlayer.angle, stepFrame, moving]);
+  
+  const texture = useLoader(TextureLoader, avatarType);
+  const avatarRef = useRef<Mesh>(null);
+
+  useFrame(({ camera }) => {
+    if (avatarRef.current) {
+      // Make the plane always face the current player (billboarding effect)
+      avatarRef.current.lookAt(camera.position);
+    }
+  });
+
   const targetRef = useRef(new Object3D());
 
   useFrame(() => {
@@ -19,27 +82,15 @@ const Avatar = ({ player, currentPlayer = false, clientId }: { player: Player, c
 
   return (
     <>
-      {/* <sprite
-        material={material}
-        position={[
-          player.x,
-          0 - (0.1 / 2),
-          player.z
-        ]}
+      <mesh
+        ref={avatarRef}
+        position={[player.x, 0 - (0.1 / 2), player.z]}
         scale={[0.75, 0.9, 0.75]}
       >
-        <primitive object={new Sprite(material)} />
-      </sprite> */}
-      <mesh position={[
-          player.x,
-          0,
-          player.z
-        ]}
-        rotation={[0, player.angle, 0]}
-      >
-        <boxGeometry args={[0.5, 1, 0.5]} />
-        <meshStandardMaterial color={"green"} />
+        <planeGeometry args={[1.5, 1.125]} />
+        <meshStandardMaterial map={texture} transparent />
       </mesh>
+      
       {
         currentPlayer && (
           <spotLight
@@ -57,7 +108,7 @@ const Avatar = ({ player, currentPlayer = false, clientId }: { player: Player, c
           />
         )
       }
-
+      
       {/* Invisible object that the spotlight is targeting */}
       <primitive object={targetRef.current} />
 

@@ -73,7 +73,7 @@ export default ({ children }: { children: (gameData: GameData) => void }) => {
           if (!result.player) {
             result.player = msg.data.players[msg.clientId];
           } else {
-            result.player = { ...result.player, ...(_.omit(msg.data.players[msg.clientId], ['x', 'z', 'angle'])) };
+            result.player = { ...result.player, ...(_.omit(msg.data.players[msg.clientId], ['x', 'z', 'angle', 'moving'])) };
           }
 
           return result;

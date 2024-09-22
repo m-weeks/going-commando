@@ -5,6 +5,7 @@ export type Player = {
   ammo: number,
   health: number,
   score?: number,
+  moving: boolean,
 }
 
 const rand = (min, max) => {
@@ -35,5 +36,6 @@ export const initializePlayer = (map: number[][]): Player => {
     angle: Math.PI,
     ammo: 1,
     health: 100,
+    moving: false,
   };
 }

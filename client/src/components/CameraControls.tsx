@@ -98,6 +98,7 @@ export default function CameraControls({ localState, updatePlayer, movementData,
       x: newPlayerData.x,
       z: newPlayerData.z,
       angle: newPlayerData.angle % (Math.PI * 2),
+      moving: newPlayerData.x !== player.x || newPlayerData.z !== player.z,
     });
   });
 

@@ -32,6 +32,7 @@ function App() {
                                 player={playerId === localState.clientId ? localState.player : player}
                                 clientId={playerId}
                                 currentPlayer={playerId === localState.clientId}
+                                curPlayer={localState.player}
                               />
                             </React.Fragment>
                           );
