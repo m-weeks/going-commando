@@ -36,11 +36,16 @@ canvas {
   width: 75px;
   height: 75px;
   border-radius: 15px;
-  background-color: #ed0e28;
+  color: white;
+  background-color: #707070;
   margin-bottom: 50px;
   pointer-events: auto;
 }
 
 .fireButton.clicked {
-  background-color: rgba(237,14,40,0.5);
+  opacity: 0.5;
+}
+
+button {
+  font-family: 'Commando', sans-serif;
 }

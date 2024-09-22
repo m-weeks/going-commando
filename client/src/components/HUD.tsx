@@ -44,11 +44,15 @@ const HUD = ({ localState, gameState, sendMessage } : { localState: LocalState, 
             </div>
             {
                 gameState.winner && (
-                    <div style={{ fontSize: '36px', position: 'fixed', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', textAlign: 'center', zIndex: 4, color: 'white' }}>
-                        {won ? 'You win!' : 'You lose!'}
+                    <div style={{ fontSize: '48px', position: 'fixed', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', textAlign: 'center', zIndex: 4, color: 'white' }}>
                         <div>
+                            <img src="/logo.png" style={{ width: '200px' }} />
+                        </div>
+                        {won ? 'You win!' : 'You lose!'}
+                        <div style={{ marginTop: '20px' }}>
                             <button style={{ fontSize: '32px', backgroundColor: 'white', padding: '20px', borderRadius: '15px' }} onClick={handleRematchClick}>
-                                RUN IT BACK
+                                {won ? 'BRING ME ANOTHER' : 'TRY AGAIN'}
+                                
                             </button>
                         </div>
                     </div>

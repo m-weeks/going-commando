@@ -8,6 +8,30 @@ import avatarData from './assets/avatar';
 const Avatar = ({ player, currentPlayer = false, clientId, curPlayer }: { player: Player, currentPlayer?: boolean, clientId: string, curPlayer: Player }) => {
   const { moving, angle } = player
 
+  const [firing, setFiring] = useState(false);
+
+  useEffect(() => {
+    let timeout;
+    const handleFire = (event: CustomEvent) => {
+      if (event.detail.clientId !== clientId) {
+        return
+      }
+      
+      setFiring(true);
+      timeout = setTimeout(() => {
+        setFiring(false);
+      }, 250);
+    }
+    // @ts-ignore
+    window.addEventListener('fire', handleFire);
+
+    return () => {
+      // @ts-ignore
+      window.removeEventListener('fire', handleFire);
+      clearTimeout(timeout);
+    };
+  }, [clientId]);
+
   const [stepFrame, setStepFrame] = useState(1);
   useEffect(() => {
     let interval;
@@ -26,27 +50,30 @@ const Avatar = ({ player, currentPlayer = false, clientId, curPlayer }: { player
     let diff = (curPlayer.angle - angle) * (180 / Math.PI);
     diff = (diff +  360) % 360;
     if (diff > 45 && diff < 135) {
-      //   if (punching) {
-      //     return avatar.right.punch;
-      //   }
+        if (firing) {
+          console.log('right shoot');
+          return avatarData.right.shoot;
+        }
       if (moving) { 
         return avatarData.right.step[stepFrame - 1];
       }
       return avatarData.right.idle;
     }
     if (diff > 135 && diff < 225) {
-      //   if (punching) {
-      //     return punchTypeRef.current;
-      //   }
+        if (firing) {
+          console.log('front shoot');
+          return avatarData.front.shoot;
+        }
       if (moving) {
         return avatarData.front.step[stepFrame - 1];
       }
       return avatarData.front.idle;
     }
     if (diff > 225 && diff < 315) {
-      //   if (punching) {
-      //     return avatar.left.punch;
-      //   }
+        if (firing) {
+          console.log('left shoot');
+          return avatarData.left.shoot;
+        }
       if (moving) { 
         return avatarData.left.step[stepFrame - 1];
       }
@@ -56,7 +83,7 @@ const Avatar = ({ player, currentPlayer = false, clientId, curPlayer }: { player
       return avatarData.behind.step[stepFrame - 1];
     }
     return avatarData.behind.idle;
-  }, [angle, curPlayer.angle, stepFrame, moving]);
+  }, [angle, curPlayer.angle, stepFrame, moving, firing]);
   
   const texture = useLoader(TextureLoader, avatarType);
   const avatarRef = useRef<Mesh>(null);

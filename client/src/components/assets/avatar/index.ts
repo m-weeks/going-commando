@@ -20,12 +20,12 @@ const avatarData = {
   },
   left: {
     idle: leftIdle,
-    punch: leftShoot,
+    shoot: leftShoot,
     step: [leftStep1, leftIdle],
   },
   right: {
     idle: rightIdle,
-    punch: rightShoot,
+    shoot: rightShoot,
     step: [rightStep1, rightIdle],
   },
   behind: {
