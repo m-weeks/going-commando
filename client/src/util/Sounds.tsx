@@ -15,6 +15,8 @@ import { Player } from "../types";
 const hitNoises = [hit1, hit2, hit3, hit4];
 const walkNoises = [walk1, walk2, walk3, walk4];
 
+const audioCache = new Map<string, AudioBuffer>();
+
 const Sounds = ({ player, curPlayer, playerId }: { player: Player, playerId: string, curPlayer: Player }) => {
   const playerRef = useRef(player);
   playerRef.current = player;
@@ -23,9 +25,24 @@ const Sounds = ({ player, curPlayer, playerId }: { player: Player, playerId: str
   const playerIdRef = useRef(playerId)
   playerIdRef.current = playerId;
 
-  const playSound = useRef((audioClip, scale = 0.5) => {
+  const audioLoaderRef = useRef(new AudioLoader());
+  const audioLoader = audioLoaderRef.current;
+
+  const loadAudio = (audioClip: string) => {
+    return new Promise<AudioBuffer>((resolve, reject) => {
+      if (audioCache.has(audioClip)) {
+        resolve(audioCache.get(audioClip)!);
+      } else {
+        audioLoader.load(audioClip, (buffer) => {
+          audioCache.set(audioClip, buffer);
+          resolve(buffer);
+        }, undefined, reject);
+      }
+    });
+  };
+
+  const playSound = useRef(async (audioClip, scale = 0.5) => {
     const listener = new AudioListener();
-    const audioLoader = new AudioLoader();
     const sound = new PositionalAudio(listener);
     
     const myPosition = [curPlayerRef.current.x, 0, curPlayerRef.current.z];
@@ -39,15 +56,16 @@ const Sounds = ({ player, curPlayer, playerId }: { player: Player, playerId: str
     if (volume < 0.02) {
       return;
     }
-
-    // Load a sound and set it as the Audio object's buffer
-    audioLoader.load(audioClip, (buffer) => {
+    try {
+      const buffer = await loadAudio(audioClip);
       sound.setBuffer(buffer);
       sound.setLoop(false);
       sound.setVolume(volume);
       sound.setDistanceModel('linear')
       sound.play();
-    });
+    } catch (err) {
+      console.error(`Failed to load audio: ${audioClip}`, err);
+    }
   })
 
   useEffect(() => {

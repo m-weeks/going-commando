@@ -1,8 +1,16 @@
-html, body {
+@font-face {
+  font-family: 'Commando';
+  src: url('/commando.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+}
+
+html, body { 
   margin: 0;
   padding: 0;
   height: 100%;
   overflow: hidden;
+  font-family: 'Commando', sans-serif;
 }
 
 canvas {
