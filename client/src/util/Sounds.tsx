@@ -1,0 +1,82 @@
+import { useEffect, useRef } from "react"
+import { AudioListener, AudioLoader, Vector3, PositionalAudio } from "three";
+import hit1 from '../components/assets/audio/hit-1.mp3';
+import hit2 from '../components/assets/audio/hit-2.mp3';
+import hit3 from '../components/assets/audio/hit-3.mp3';
+import hit4 from '../components/assets/audio/hit-4.mp3';
+import shot from '../components/assets/audio/shot.mp3';
+import reload from '../components/assets/audio/reload.mp3';
+import { Player } from "../types";
+
+const hitNoises = [hit1, hit2, hit3, hit4];
+
+const Sounds = ({ player, curPlayer, playerId }: { player: Player, playerId: string, curPlayer: Player }) => {
+  const playerRef = useRef(player);
+  playerRef.current = player;
+  const curPlayerRef = useRef(curPlayer);
+  curPlayerRef.current = curPlayer;
+  const playerIdRef = useRef(playerId)
+  playerIdRef.current = playerId;
+
+  const playSound = useRef((audioClip, scale = 0.5) => {
+    const listener = new AudioListener();
+    const audioLoader = new AudioLoader();
+    const sound = new PositionalAudio(listener);
+    
+    const myPosition = [curPlayerRef.current.x, 0, curPlayerRef.current.z];
+    const playerPosition = [playerRef.current.x, 0, playerRef.current.z];
+
+    const playerPos = new Vector3(...playerPosition);
+    const myPos = new Vector3(...myPosition);
+    const distance = playerPos.distanceTo(myPos);
+    const volume = Math.min(1 / Math.pow(distance, 4), 1) * scale;
+
+    if (volume < 0.02) {
+      return;
+    }
+
+    // Load a sound and set it as the Audio object's buffer
+    audioLoader.load(audioClip, (buffer) => {
+      sound.setBuffer(buffer);
+      sound.setLoop(false);
+      sound.setVolume(volume);
+      sound.setDistanceModel('linear')
+      sound.play();
+    });
+  })
+
+  useEffect(() => {
+    const handleReload = () => {
+      playSound.current(reload, 0.5);
+    }
+    window.addEventListener('reloaded', handleReload);
+
+    const handleDamageTaken = (event: CustomEvent) => {
+      if (event.detail.playerId === playerIdRef.current) {
+        playSound.current(hitNoises[Math.floor(Math.random() * hitNoises.length)], 1);
+      }
+    }
+    // @ts-ignore
+    window.addEventListener('damageTaken', handleDamageTaken);
+
+    const handleFire = (event: CustomEvent) => {
+      if (event.detail.clientId === playerIdRef.current) {
+        playSound.current(shot, 0.5);
+      }
+    }
+    // @ts-ignore
+    window.addEventListener('fire', handleFire);
+
+    return () => {
+      window.removeEventListener('reloaded', handleReload);
+      // @ts-ignore
+      window.removeEventListener('damageTaken', handleDamageTaken);
+      // @ts-ignore
+      window.removeEventListener('fire', handleFire);
+    }
+  }, [])
+
+  return null;
+}
+
+export default Sounds;

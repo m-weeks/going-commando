@@ -6,6 +6,8 @@ import CameraControls from './components/CameraControls';
 import Avatar from './components/Avatar';
 import Controls from './components/controls/Controls';
 import HUD from './components/HUD';
+import Sounds from './util/Sounds';
+import React from 'react';
 
 function App() {
   return (
@@ -23,22 +25,15 @@ function App() {
                       <Map mapData={gameState.map} />
                       {
                         _.map(gameState.players, (player, playerId) => {
-                          if (playerId === localState.clientId) {
-                            return (
-                              <Avatar
-                                key={playerId}
-                                player={localState.player}
-                                currentPlayer
-                                clientId={playerId}
-                              />
-                            );
-                          }
                           return (
-                            <Avatar
-                              key={playerId}
-                              player={player}
-                              clientId={playerId}
-                            />
+                            <React.Fragment key={playerId}>
+                              <Sounds player={player} curPlayer={localState.player} playerId={playerId} />
+                              <Avatar
+                                player={playerId === localState.clientId ? localState.player : player}
+                                clientId={playerId}
+                                currentPlayer={playerId === localState.clientId}
+                              />
+                            </React.Fragment>
                           );
                         })
                       }
