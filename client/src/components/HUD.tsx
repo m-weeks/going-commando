@@ -15,11 +15,13 @@ const HUD = ({ localState, gameState, sendMessage } : { localState: LocalState, 
         <>
             {
                 (gameState.reloadTimer) && (
-                    <div style={{ position: 'fixed', zIndex: 2, top: '25px', width: '100%', color: 'white', textAlign: 'center', fontSize: '12px' }}>
-                        <div>
+                    <div style={{ position: 'fixed', zIndex: 2, top: '25px', width: '100%', color: 'white', textAlign: 'center', fontSize: '12px' }} className="stroke">
+                        <div style={{ marginBottom: '4px' }}>
                             Reloading in<Ellipsis/>
                         </div>
-                        {gameState.reloadTimer}
+                        <div style={{ fontSize: '32px' }}>
+                            {gameState.reloadTimer}
+                        </div>
                     </div>
                 )
             }
@@ -60,7 +62,7 @@ const HUD = ({ localState, gameState, sendMessage } : { localState: LocalState, 
             }
             {
                 player.score && (
-                    <div style={{ position: 'fixed', zIndex: 2, top: '25px', right: '25px', color: 'white', fontSize: '12px' }}>
+                    <div style={{ position: 'fixed', zIndex: 2, top: '25px', right: '25px', color: 'white', fontSize: '12px' }} className="stroke">
                         Score: {player.score}
                     </div>
                 )
