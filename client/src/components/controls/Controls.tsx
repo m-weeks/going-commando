@@ -80,7 +80,6 @@ const Controls = ({ children, sendMessage }: { children: ({ movementData } : { m
 
   const handleFire = () => {
     setClicked(true);
-    // window.dispatchEvent(new CustomEvent('fire', { detail: { clientId } }));
     sendMessage('FIRE', {})
   }
 

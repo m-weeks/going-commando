@@ -90,6 +90,10 @@ export default ({ children }: { children: (gameData: GameData) => void }) => {
             ...data.player,
           },
         }))
+      } else if (msg.type === 'RELOADED') {
+        window.dispatchEvent(new CustomEvent('reloaded'));
+      } else if (msg.type === 'DAMAGE_TAKEN') {
+        window.dispatchEvent(new CustomEvent('damageTaken', { detail: { playerId: msg.data.playerId } }));
       }
     }
   

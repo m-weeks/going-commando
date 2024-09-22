@@ -81,7 +81,6 @@ const FiringCone = ({ player, clientId }: { player: Player, clientId: string }) 
           speed: PROJECTILE_SPEED * (0.6 + Math.random() * 0.8)
         });
       }
-      console.log(newProjectiles.map(p => p.size))
       setProjectiles(newProjectiles);
 
       setTimeout(() => {

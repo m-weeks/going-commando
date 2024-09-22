@@ -140,6 +140,12 @@ export const fire = (clientId) => {
       const minDamage = 10;
       const damage = maxDamage - ((maxDamage - minDamage) * (distance / CONE_RANGE));
       lobby.gameState.players[playerId].health -= Math.max(minDamage, damage);
+      broadcastMsg(lobby.id, {
+        type: 'DAMAGE_TAKEN',
+        data: {
+          playerId
+        }
+      });
     }
   })
 
@@ -164,6 +170,9 @@ export const fire = (clientId) => {
         lobby.gameState.reloadTimer = null;
         _.forEach(lobby.gameState.players, (_, playerId) => {
           lobby.gameState.players[playerId].ammo = 1;
+          broadcastMsg(lobby.id, {
+            type: 'RELOADED'
+          });
         })
       }
     }, 1000);
