@@ -154,7 +154,19 @@ export default ({ children }: { children: (gameData: GameData) => void }) => {
   }
 
   if (disconnected) {
-    return <div>Disconnected</div>
+    return (
+      <div style={{ height: '100vh', width: '100vw', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '48px' }}>
+        <div style={{ textAlign: 'center' }}>
+          <img src="/logo.png" style={{ width: '200px' }} />
+          <div>
+            Disconnected
+          </div>
+          <div style={{ fontSize: '24px' }}>
+            Please reload and try again
+          </div>
+        </div>
+      </div>
+    )
   }
 
   return (
